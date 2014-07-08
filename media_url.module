@@ -107,10 +107,23 @@ function media_url_element_validate($element, &$form_state, $complete_form) {
   unset($form_state['values']['media_url']);
 }
 
-/*
+/**
+ * Implements hook_entity_view().
+ */
+function media_url_entity_view($entity, $type, $view_mode, $langcode) {
+  if($type == 'file') {
+    drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
 function media_url_entity_update($entity, $type) {
-  dd($entity);
-}*/
+  if($type == 'file') {
+    drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+  }
+}
 
 /**
  * Build the file URL and encode it if necessary.
