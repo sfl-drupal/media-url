@@ -10,6 +10,9 @@
 // By default, enable URL encoding
 define('MEDIA_URL_DEFAULT_ENCODING', 1);
 
+define('MEDIA_URL_DISPLAY_UPDATE', 1);
+define('MEDIA_URL_DISPLAY_VIEW', 2);
+
 /**
  * Implements hook_menu().
  */
@@ -40,6 +43,22 @@ function media_url_config($form, &$form_state) {
     '#title' => t('By default, display URL as encoded'),
     '#default_value' => variable_get('media_url_default_encoding', MEDIA_URL_DEFAULT_ENCODING),
   );
+
+ $form['media_url_display'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('System messages'),
+    '#description' => t('Configure where you want to display the media URL.'),
+  );
+  $form['media_url_display']['media_url_display_action'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Display media URL in the system messages'),
+    '#options' => array(
+      MEDIA_URL_DISPLAY_UPDATE => t('During creation and update of a file entity'),
+      MEDIA_URL_DISPLAY_VIEW => t('On the file entity page'),
+    ),
+    '#default_value' => variable_get('media_url_display_action', array()),
+  );
+
   return system_settings_form($form);
 }
 
@@ -112,7 +131,10 @@ function media_url_element_validate($element, &$form_state, $complete_form) {
  */
 function media_url_entity_view($entity, $type, $view_mode, $langcode) {
   if($type == 'file') {
-    drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+    $display = variable_get('media_url_display_action', array());
+    if($display[MEDIA_URL_DISPLAY_VIEW] != 0) {
+      drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+    }
   }
 }
 
@@ -121,7 +143,10 @@ function media_url_entity_view($entity, $type, $view_mode, $langcode) {
  */
 function media_url_entity_update($entity, $type) {
   if($type == 'file') {
-    drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+    $display = variable_get('media_url_display_action', array());
+    if($display[MEDIA_URL_DISPLAY_UPDATE] != 0) {
+      drupal_set_message(t('Media URL: %url', array('%url' => media_url_encode_file_uri($entity))));
+    }
   }
 }
 
