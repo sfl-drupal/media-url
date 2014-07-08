@@ -1,0 +1,3 @@
+name = Media URL
+description = Various hook implementation to give an easya access to the actual media URL
+core = 7.x

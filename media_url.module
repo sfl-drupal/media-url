@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter() for file_entity_edit().
+ */
+function media_url_form_file_entity_edit_alter(&$form, $form_state) {
+  // Make sure this does not show up on the delete confirmation form.
+  if (empty($form_state['confirm_delete'])) {
+    // Use a lightweight version if we are editing multiple files at once
+    $edit_multiple =  strpos($form['#action'], 'edit-multiple');
+    $file = $form_state['file'];
+
+    $form['media_url'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Media URL'),
+      '#collapsible' => TRUE,
+      '#group' => 'additional_settings',
+      '#attributes' => array(
+        'class' => array('media-url-form'),
+      ),
+      '#attached' => array(
+        'js' => array(drupal_get_path('module', 'media_url') . '/copy.js'),
+      ),
+      '#access' => user_access('administer files'),
+      '#weight' => -30,
+      '#tree' => TRUE,
+      '#element_validate' => array('media_url_element_validate'),
+    );
+
+    if(!$edit_multiple) {
+      $form['media_url']['encode'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Encode URL'),
+        '#description' => t('Whether to display and use the encoded or raw url.'),
+        '#default_value' => 0,
+        '#weight' => -20,
+      );
+    }
+
+    $form['media_url']['uri'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Media URL'),
+      '#default_value' => file_create_url($file->uri),
+      '#description' => t('CTRL-C to copy to the clipboard.'),
+      '#weight' => -10,
+      //'#disabled' => TRUE,
+      '#attributes' => array(
+        'readonly'=>'readonly',
+        'style'=>'background: none repeat scroll 0 0 #EAEAEA;'
+      ),
+    );
+
+    if(!$edit_multiple) {
+      $form['media_url']['copy'] = array(
+        '#type' => 'button',
+        '#default_value' => t('Copy to clipboard'),
+        '#weight' => -5,
+      );
+    }
+  }
+}
+
+function media_url_element_validate($element, &$form_state, $complete_form) {
+  unset($form_state['values']['media_url']);
+}
