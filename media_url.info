@@ -1,3 +1,6 @@
 name = Media URL
-description = Various hook implementation to give an easya access to the actual media URL
+description = Provides editors with an easy way to retrieve a media URL to use it in a text editor.
+
+dependencies[] = media
+
 core = 7.x
